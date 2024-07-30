@@ -18,4 +18,6 @@ return {
   { import = "astrocommunity.split-and-window.windows-nvim" },
 
   { import = "astrocommunity.colorscheme.nordic-nvim" },
+
+  { import = "astrocommunity.git.neogit" },
 }
