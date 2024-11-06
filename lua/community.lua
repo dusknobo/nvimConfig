@@ -11,9 +11,9 @@ return {
   { import = "astrocommunity.pack.cpp" },
   { import = "astrocommunity.pack.cmake" },
   { import = "astrocommunity.pack.python" },
+  { import = "astrocommunity.pack.julia" },
 
---  { import = "astrocommunity.workflow.hardtime-nvim" },
-
+  --  { import = "astrocommunity.workflow.hardtime-nvim" },
   { import = "astrocommunity.split-and-window.mini-map" },
   { import = "astrocommunity.split-and-window.windows-nvim" },
 
