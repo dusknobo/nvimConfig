@@ -1,0 +1,151 @@
+Local Neovim development configuration
+=====================================
+
+Scope
+-----
+The base configuration is dusknobo/nvimConfig with AstroNvim v6.1.
+Local overrides add C++/Rust development support without enabling the upstream
+example templates. No plugin upgrade or lockfile regeneration is required.
+
+Files that matter
+-----------------
+~/.config/nvim/lua/lazy_setup.lua
+  Loads AstroNvim, the community entry point, and lua/plugins overrides.
+
+~/.config/nvim/lua/plugins/development.lua
+  C++ module filetypes, development parsers, system language servers and
+  clang-format, plus the system LLDB debug adapter.
+
+~/.config/nvim/lua/plugins/dashboard-logo.lua
+  Local Braille dashboard art. Rows are padded to equal display width to keep
+  the picture aligned. This file is independent of the development settings.
+
+~/.config/nvim/lua/user/cmake.lua
+  Local asynchronous CMake command helper.
+
+~/.config/nvim/lua/plugins/cmake-workflow.lua
+  Registers the local CMake commands and exposes them under the Space m menu.
+
+~/.config/nvim/lazy-lock.json
+  Records installed plugin revisions. Keep it with the local customizations
+  when backing up or versioning this configuration.
+
+Several other upstream files start with `if true then return ... end`.
+Those files are intentionally inactive examples, not additional active settings.
+Do not remove all of these guards at once: the files include demonstration
+options and mappings that are not needed by this setup.
+
+System tools
+------------
+C/C++ language server: /usr/bin/clangd
+C/C++ formatter:       /usr/bin/clang-format
+Debug adapter:         /usr/bin/lldb-dap
+Rust language server:  ~/.cargo/bin/rust-analyzer
+Rust checks:           rustup toolchain Clippy
+Build tools:           system CMake and Ninja
+Lua language server:   Mason-managed lua-language-server
+
+Mason does not need to install another clangd or rust-analyzer. Rust Analyzer
+uses cargo.features = "all" and check.command = "clippy". All-features checks
+can be unsuitable for projects with mutually exclusive Cargo features; adjust
+that setting for such a project rather than treating it as a compiler fault.
+clangd logging is limited to errors. The system clang-format source supplies
+C/C++ formatting; AstroLSP excludes clangd from formatting to avoid duplicates.
+
+CMake commands and shortcuts
+---------------------------
+The leader is Space. Press Space, release it, then press m and the final key.
+
+  Space m c    :CMakeConfigure    Configure the current project
+  Space m b    :CMakeBuild        Configure, then build
+  Space m t    :CMakeTest         Configure, build, then run CTest
+  Space m p    :CMakePreset       Select a configure preset
+  Space m l    :CMakeLog          Open the command log
+  Space m i    :CMakeInfo         Show project/build information
+  Space m x    :CMakeStop         Stop the helper's running job
+
+Use these mappings inside Neovim. Niri's Alt bindings and Zellij's Win bindings
+remain separate and are not changed by this configuration.
+
+Preset and build behavior
+-------------------------
+The helper uses configure presets. One available preset is selected
+automatically; with several presets, choose one when prompted. The choice is
+remembered for the current Neovim session, not written into the project.
+The build directory is taken from the actual configure output rather than
+assuming that a preset always writes to ./build.
+
+Build first configures the project, then builds that tree. Test first
+configures, then builds, and runs CTest only after a successful build.
+These commands do NOT apply build-preset/test-preset-specific targets,
+environment, or other options. For a project that depends on those preset
+features, use its normal terminal commands, such as
+cmake --build --preset <name> or ctest --preset <name>, instead of assuming
+that this helper reproduces them.
+
+Without configure presets, an existing cache in the project's build directory
+is respected. With no cache there, the helper uses a Ninja Debug build and
+CMake's normal compiler selection. It requests CMAKE_EXPORT_COMPILE_COMMANDS=ON,
+but does not edit
+project source/configuration files or create a compile_commands.json symlink.
+Configure presets continue to control their own generator and toolchain.
+
+The default build parallelism is 2, appropriate for this laptop. To override:
+
+  vim.g.cmake_build_jobs = 2
+
+For multi-configuration generators, the default configuration is Debug:
+
+  vim.g.cmake_build_config = "Debug"
+
+Set overrides before starting a build. A project can still be configured and
+built from a terminal independently of these editor commands.
+
+Language services and C++ modules
+--------------------------------
+Extensions cppm, cxxm, ixx and mpp are treated as C++. clangd is started with
+background indexing, clang-tidy, project configuration support, and its
+experimental module support flag. Its compiler-query allowlist covers the
+installed system Clang and GCC drivers, not arbitrary binaries.
+
+C++ module analysis remains experimental. Successful compilation does not
+guarantee complete editor completion or navigation for every module pattern.
+Keep the project compile database current and point clangd at the correct
+build directory when it is not discoverable automatically. For the existing
+clang-cpp-modules-example, its project .clangd and compile-database link are
+separate from this global Neovim configuration.
+
+LLDB debugging
+--------------
+The C/C++/Rust launch configuration uses the system LLDB adapter. The executable
+prompt remembers the last selected program in the current editor session.
+Cancelling the prompt or selecting a nonexistent executable aborts that launch.
+The working directory is derived from the current source project rather than
+silently reusing an unrelated editor working directory. This launcher does not
+implicitly build a selected CMake target or import every launch.json option.
+
+Logs and problems
+-----------------
+Use :CMakeLog for command output and :CMakeInfo to confirm the selected project,
+configure preset, build directory and active job before troubleshooting.
+Inspect reported command failures and the quickfix list with :copen;
+:cnext and :cprevious navigate parsed diagnostics. Compiler output formats that
+are not parsed into quickfix remain available in the retained command log.
+Logs are held in memory for this editor session and bounded to the most recent
+1500 lines, with each line limited to 8192 bytes; omitted output is marked.
+Use :CMakeStop to cancel the helper's job, not a separate build started in a
+terminal. Do not start repeated builds while a job is still running.
+
+For editor diagnostics, :LspInfo identifies attached clients and :checkhealth
+reports runtime/tooling issues. :messages contains Neovim error messages.
+If completion breaks after a project change, first check its configure/build
+result and compile database rather than immediately updating all plugins.
+
+Maintenance
+-----------
+Back up development.lua, dashboard-logo.lua, the local CMake helper/mapping
+override, and lazy-lock.json together. Custom files can be absent from the
+upstream repository even when present on disk, so copying only upstream
+tracked files is not a complete backup.
+This optimization does not run :Lazy update, change plugin versions, create
+Git commits, or modify the existing dashboard design and desktop shortcuts.
