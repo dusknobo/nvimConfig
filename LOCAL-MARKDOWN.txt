@@ -1,0 +1,31 @@
+Local Markdown support
+======================
+Open a .md file in a newly started Neovim. render-markdown.nvim loads only for
+Markdown, its command, or its explicit toggle mapping. Existing editors are
+not forcibly reloaded during installation.
+
+Normal-mode rendering decorates headings, code blocks, tables, lists, links
+and task checkboxes. The cursor line is shown less decorated for editing;
+insert mode normally shows raw Markdown. This is editor rendering, not an
+HTML/browser preview and not native image display.
+
+  Space u m                 Toggle Markdown rendering on/off
+  :RenderMarkdown toggle    The equivalent command
+  :RenderMarkdown preview   Open the plugin's rendered split preview
+
+Space is a sequence prefix, not held down. Markdown rendering does not change
+the file's text. Existing Neovim, CMake, Niri Alt and Zellij Win keys remain.
+
+The configuration reuses the existing markdown/markdown_inline parsers and
+mini.icons. The plugin's v8 release series is constrained in the specification
+and the exact installed revision is recorded in lazy-lock.json. Other plugin
+revisions are not upgraded by this installation.
+
+Optional TeX rendering is disabled to avoid requiring extra TeX converters.
+Regular Markdown rendering is skipped for files larger than 2 MB. The local
+in-process completion provider supplies checkbox/callout candidates to the
+existing completion stack; it is not a general Markdown language server.
+
+This installation does not add a browser service, formatter/linter or external
+Markdown language server. It also does not change your default editor or push
+the new local configuration to GitHub automatically.
