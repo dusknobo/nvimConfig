@@ -6,11 +6,11 @@ A template for getting started with [AstroNvim](https://github.com/AstroNvim/Ast
 
 ## Local documentation
 
-- [Neovim keybindings guide (简体中文)](docs/neovim-keybindings-guide.md): detailed keys by function, with common and less-common operations, mode differences, examples, and safety notes.
+- [Neovim keybindings guide (简体中文)](docs/neovim-keybindings-guide.md): entry-point quick reference, detailed common and less-common keys grouped by entry, mode differences, safety notes, and complete workflows at the end.
 - [C++/Rust and CMake development](LOCAL-DEVELOPMENT.txt)
 - [Markdown rendering](LOCAL-MARKDOWN.txt)
 
-The keybindings guide describes this configuration and its machine-specific physical key remapping. Check the notation and mode before using a shortcut.
+The keybindings guide describes this Neovim configuration using standard key names such as Ctrl and Esc. Check the notation and mode before using a shortcut.
 
 ## 🛠️ Installation
 
