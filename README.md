@@ -4,6 +4,14 @@
 
 A template for getting started with [AstroNvim](https://github.com/AstroNvim/AstroNvim)
 
+## Local documentation
+
+- [Neovim keybindings guide (简体中文)](docs/neovim-keybindings-guide.md): detailed keys by function, with common and less-common operations, mode differences, examples, and safety notes.
+- [C++/Rust and CMake development](LOCAL-DEVELOPMENT.txt)
+- [Markdown rendering](LOCAL-MARKDOWN.txt)
+
+The keybindings guide describes this configuration and its machine-specific physical key remapping. Check the notation and mode before using a shortcut.
+
 ## 🛠️ Installation
 
 #### Make a backup of your current nvim and shared folder
