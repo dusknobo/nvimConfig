@@ -1,0 +1,105 @@
+Local Typst environment (2026-10-24)
+==================================
+
+PDF split update: use Kitty directly (outside Zellij). ImageMagick and
+Ghostscript were installed from Fedora with mandatory dependencies only.
+The existing Snacks image viewer is reused; no new Neovim plugin was added.
+
+Compiler: Typst 0.15.1, installed at ~/.local/bin/typst.
+Language service: official Tinymist v0.15.10 (Typst engine 0.15.1), installed
+at ~/.local/bin/tinymist. Official release asset SHA256 digests were checked.
+The binaries live in ~/.local/share/typst-tools/versioned-directories.
+No system package or existing Python/C++/Rust setup was replaced.
+
+Neovim
+------
+Open a .typ file. Tinymist provides completion, hover, navigation, diagnostics
+and its embedded Typstyle formatter; no separate typstyle executable is needed.
+The Typst Treesitter parser provides syntax highlighting. Existing entries:
+
+  Ctrl+Space       Completion in insert mode
+  K / gd           Hover / definition (when supported at that location)
+  Space l f        Format source
+  Space l d        Full diagnostic details
+  [d / ]d          Previous / next diagnostic
+  Space w          Save (existing formatting-on-save policy still applies)
+
+New commands, without replacing any shortcut:
+
+  :TypstCompile    Compile saved source; open/refresh PDF to the right
+  :TypstPreview    Compile and open/refresh the same in-editor PDF split
+  :TypstPdf        Alias for the in-editor compile/PDF workflow
+  :TypstBrowser    Start the optional browser preview on localhost
+  :TypstStop       Close this tab's PDF preview and stop its browser preview
+  :TypstInfo       Show current job status and recent preview messages
+
+Save before compile/preview. These commands do not silently save source.
+Opening a source file does not start a preview or write a PDF. Compile
+successfully to show source on the left and the rendered PDF on the right;
+editing focus remains on the source. Subsequent successful compilations
+refresh that same split and preserve the page, clamping when the PDF shrinks.
+Compile failures leave the last good image in place. Nothing auto-compiles
+on typing or saving. External terminal compilations can be refreshed with r.
+
+Inside the PDF preview only:
+  ]p / [p          Next / previous page
+  r                Reload the current PDF page
+  q                Close the preview without closing source
+
+Use Ctrl+w l / Ctrl+w h to move between source and preview. The preview is a
+read-only image, not a text-selectable or searchable full PDF reader.
+Transient PDF snapshots/PNGs in ~/.cache/nvim/typst-pdf avoid stale image
+caches. Only this editor's generated regular files are removed on exit;
+source PDFs and source buffers are never removed by preview cleanup.
+Rendering is asynchronous, one page at a time, with a 20-second timeout.
+
+The optional browser preview still reads saved on-disk files and refreshes
+after saves. Its listeners bind 127.0.0.1; no permanent/LAN service is added.
+
+Main file and project root
+-------------------------
+By default the current .typ file is the main file. For a child file, set:
+
+  :let b:typst_main = '../main.typ'
+
+The path is relative to that buffer's directory (or use an absolute path).
+Root is the nearest typst.toml/.git directory, else the main file's folder.
+The PDF is written beside the main file, replacing a prior matching PDF.
+Unsaved changes in other buffers are not included until they are saved too.
+Tinymist's LspTinymistPinMain command can separately pin the language-server
+main file; b:typst_main controls only these local compile/preview commands.
+The in-editor viewer preserves the source buffer and its existing splits;
+it does not switch the user's tab if compilation finishes after moving away.
+
+Terminal workflow
+-----------------
+  cd ~/code/typst-starter
+  typst compile main.typ main.pdf
+  typst watch main.typ main.pdf
+  tinymist preview --open main.typ
+
+Ctrl+c stops terminal watch/preview. The Neovim preview commands explicitly
+bind all their listeners to localhost. No cloud account is required.
+
+Example: ~/code/typst-starter/main.typ, with English/Chinese text, mathematics,
+a table and code. Uses existing Noto Serif CJK SC for Chinese fallback; no
+input method, locale change, third-party template or network package needed.
+
+Configuration files: lua/plugins/typst-development.lua, lua/user/typst.lua,
+lua/plugins/typst-pdf-view.lua and lua/user/typst_pdf.lua.
+Restart Neovim normally to load them. Typst support does not require changing
+the existing plugin versions or lockfile. Configuration and this guide are
+versioned in the Neovim repository; tool binaries, fonts, generated PDFs and
+preview caches are installed/generated locally and are not included.
+
+Official references
+-------------------
+https://typst.app/docs/
+https://myriad-dreamin.github.io/tinymist/frontend/neovim.html
+https://myriad-dreamin.github.io/tinymist/feature/preview.html
+https://github.com/folke/snacks.nvim/blob/main/docs/image.md
+
+Other GitHub plugins reviewed: r-pletnev/pdfreader.nvim (PDF reader with
+extra Telescope dependency); propilideno/buffer-preview.nvim (image.nvim
+backend and current BufLeave clearing behavior); chomosuke/typst-preview.nvim
+(browser-based preview). None was installed for this in-editor workflow.
